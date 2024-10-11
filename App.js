@@ -1,4 +1,6 @@
 import { colors } from './styles/colors';
+console.log('Colors in App.js:', colors);
+
 import React from 'react';
 import { registerRootComponent } from 'expo';
 import { NavigationContainer } from '@react-navigation/native';
@@ -72,7 +74,6 @@ export default function App() {
         <Stack.Screen 
           name="Login" 
           component={LoginScreen} 
-          options={{ headerShown: false }}
         />
         <Stack.Screen 
           name="Registration" 

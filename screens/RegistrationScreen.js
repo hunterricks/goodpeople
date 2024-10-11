@@ -3,6 +3,9 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'reac
 import { colors } from '../styles/colors';
 import { createUser } from '../api';  // Adjust the path if necessary
 import axios from 'axios';
+import { API_URL } from '../utils/constants';
+
+console.log('Colors in RegistrationScreen:', colors);
 
 const RegistrationScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
@@ -19,22 +22,20 @@ const RegistrationScreen = ({ navigation }) => {
   };
 
   const handleRegister = async () => {
-    console.log('handleRegister called');  // Add this line
-    await testServerConnection();
-    if (password !== confirmPassword) {
-      Alert.alert('Error', 'Passwords do not match');
-      return;
-    }
-
+    console.log('handleRegister called');
     try {
-      console.log('Attempting to create user');  // Add this line
-      const response = await createUser({ email, password });
-      console.log('User created:', response);  // Add this line
-      Alert.alert('Success', 'Account created successfully');
-      navigation.navigate('Login');
+      console.log('Attempting to create user');
+      const response = await axios.post(`${API_URL}/api/register`, { email, password });
+      console.log('Server response:', response.data);
+      if (response.data.message === 'User created successfully') {
+        Alert.alert('Success', 'Account created successfully');
+        navigation.navigate('Login');
+      } else {
+        Alert.alert('Error', response.data.message || 'Failed to create account');
+      }
     } catch (error) {
-      console.error('Registration error:', error);  // Modify this line
-      Alert.alert('Error', 'Registration failed. Please try again.');
+      console.error('Registration error:', error.response ? error.response.data : error.message);
+      Alert.alert('Error', 'Failed to create account. Please try again.');
     }
   };
 

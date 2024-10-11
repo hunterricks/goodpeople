@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Image } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { removeToken } from '../utils/authUtils';
 import { colors } from '../styles/colors';

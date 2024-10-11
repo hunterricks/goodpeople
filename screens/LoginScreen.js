@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons';
 import { colors } from '../styles/colors';
 import { saveToken } from '../utils/authUtils';
-import axios from 'axios'; // Assuming you have axios installed
-import { API_URL } from '../utils/constants'; // Assuming you have API_URL defined
+import axios from 'axios';
+import { API_URL } from '../utils/constants';
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
@@ -19,7 +20,7 @@ const LoginScreen = ({ navigation }) => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post(`${API_URL}/login`, { email, password });
+      const response = await axios.post(`${API_URL}/api/login`, { email, password });
       if (response.data.success) {
         const token = response.data.token;
         await saveToken(token);
@@ -37,7 +38,8 @@ const LoginScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Welcome to GoodPeople</Text>
+      <Text style={styles.header}>Welcome to GoodPeople</Text>
+      <Text style={styles.subHeader}>Login to your account</Text>
       <TextInput
         style={styles.input}
         placeholder="Email"
@@ -57,11 +59,17 @@ const LoginScreen = ({ navigation }) => {
         secureTextEntry
         editable={!isLoading}
       />
-      <TouchableOpacity style={styles.button} onPress={handleLogin} disabled={isLoading}>
-        <Text style={styles.buttonText}>{isLoading ? 'Logging In...' : 'Log In'}</Text>
+      <TouchableOpacity style={styles.loginButton} onPress={handleLogin} disabled={isLoading}>
+        <Icon name="log-in-outline" size={24} color={colors.background} />
+        <Text style={styles.loginButtonText}>{isLoading ? 'Logging In...' : 'Log In'}</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => navigation.navigate('Registration')} disabled={isLoading}>
-        <Text style={styles.linkText}>Don't have an account? Sign Up</Text>
+      <TouchableOpacity 
+        style={styles.registerButton} 
+        onPress={() => navigation.navigate('Registration')}
+        disabled={isLoading}
+      >
+        <Icon name="person-add-outline" size={24} color={colors.background} />
+        <Text style={styles.registerButtonText}>Create an Account</Text>
       </TouchableOpacity>
     </View>
   );
@@ -74,11 +82,18 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: colors.background,
   },
-  title: {
+  header: {
     fontSize: 24,
     fontWeight: 'bold',
     color: colors.text,
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  subHeader: {
+    fontSize: 18,
+    fontWeight: 'bold',
     marginBottom: 20,
+    color: colors.secondary,
     textAlign: 'center',
   },
   input: {
@@ -87,25 +102,37 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginBottom: 15,
     paddingHorizontal: 10,
-    borderRadius: 5,
+    borderRadius: 8,
     color: colors.text,
+    fontSize: 16,
   },
-  button: {
+  loginButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: colors.primary,
     padding: 15,
-    borderRadius: 5,
-    alignItems: 'center',
+    borderRadius: 8,
+    marginBottom: 15,
   },
-  buttonText: {
+  loginButtonText: {
     color: colors.background,
     fontSize: 16,
     fontWeight: 'bold',
   },
-  linkText: {
-    color: colors.text,
-    fontSize: 16,
-    textAlign: 'center',
+  registerButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.secondary,
+    padding: 15,
+    borderRadius: 8,
     marginTop: 10,
+  },
+  registerButtonText: {
+    color: colors.background,
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
 

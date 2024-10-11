@@ -21,6 +21,8 @@ const JobsScreen = ({ navigation }) => {
   const [selectedBudgetRange, setSelectedBudgetRange] = useState('All');
   const [showFilters, setShowFilters] = useState(false);
 
+  console.log('Colors in JobsScreen:', colors);
+
   const renderItem = ({ item }) => (
     <TouchableOpacity
       style={styles.jobItem}

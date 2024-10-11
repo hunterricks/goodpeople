@@ -1,4 +1,3 @@
-   import { colors } from '../styles/colors';
 import * as SecureStore from 'expo-secure-store';
 
 // Function to save the token

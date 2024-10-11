@@ -4,6 +4,8 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { colors } from '../styles/colors';
 import SearchBar from '../components/SearchBar';
 
+console.log('Colors in HomeScreen:', colors);
+
 const dummyJobs = [
   { id: '1', title: 'React Native Developer', budget: '$30-50/hr', description: 'We need a skilled React Native developer for a 3-month project.' },
   { id: '2', title: 'UI/UX Designer', budget: '$1000-2000', description: 'Looking for a creative UI/UX designer to redesign our mobile app.' },
