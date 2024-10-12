@@ -1,18 +1,25 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal, TextInput } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal, TextInput, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { colors } from '../styles/colors';
 
 const JobDetailsScreen = ({ route, navigation }) => {
   const { job } = route.params;
-  const [showApplicationModal, setShowApplicationModal] = useState(false);
+  const [showBidModal, setShowBidModal] = useState(false);
+  const [bidAmount, setBidAmount] = useState('');
+  const [deliveryTime, setDeliveryTime] = useState('');
   const [coverLetter, setCoverLetter] = useState('');
-  const [proposedRate, setProposedRate] = useState('');
 
-  const handleSubmitApplication = () => {
-    // Here you would typically send the application data to your backend
-    console.log('Submitting application:', { coverLetter, proposedRate });
-    setShowApplicationModal(false);
+  const handleSubmitBid = () => {
+    if (!bidAmount || !deliveryTime || !coverLetter) {
+      Alert.alert('Error', 'Please fill in all fields');
+      return;
+    }
+
+    // Here you would typically send the bid data to your backend
+    console.log('Submitting bid:', { bidAmount, deliveryTime, coverLetter });
+    Alert.alert('Success', 'Your bid has been submitted!');
+    setShowBidModal(false);
     navigation.navigate('Proposals');
   };
 
@@ -21,39 +28,77 @@ const JobDetailsScreen = ({ route, navigation }) => {
       <Text style={styles.title}>{job.title}</Text>
       <Text style={styles.budget}>{job.budget}</Text>
       <Text style={styles.category}>{job.category}</Text>
+      
+      <View style={styles.clientInfo}>
+        <Icon name="person-circle-outline" size={24} color={colors.text} />
+        <View style={styles.clientDetails}>
+          <Text style={styles.clientName}>{job.clientName}</Text>
+          <Text style={styles.clientLocation}>{job.clientLocation}</Text>
+        </View>
+        <Text style={styles.postedDate}>Posted {job.postedDate}</Text>
+      </View>
+
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Job Description</Text>
         <Text style={styles.description}>{job.description}</Text>
       </View>
+
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Skills Required</Text>
         <View style={styles.skillsContainer}>
-          {['React Native', 'JavaScript', 'Mobile Development'].map((skill, index) => (
+          {job.skills.map((skill, index) => (
             <View key={index} style={styles.skillItem}>
               <Text style={styles.skillText}>{skill}</Text>
             </View>
           ))}
         </View>
       </View>
-      <TouchableOpacity style={styles.applyButton} onPress={() => setShowApplicationModal(true)}>
-        <Text style={styles.applyButtonText}>Apply Now</Text>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Job Details</Text>
+        <View style={styles.detailItem}>
+          <Icon name="briefcase-outline" size={20} color={colors.text} />
+          <Text style={styles.detailText}>Project Type: {job.projectType}</Text>
+        </View>
+        <View style={styles.detailItem}>
+          <Icon name="star-outline" size={20} color={colors.text} />
+          <Text style={styles.detailText}>Experience Level: {job.experienceLevel}</Text>
+        </View>
+        <View style={styles.detailItem}>
+          <Icon name="time-outline" size={20} color={colors.text} />
+          <Text style={styles.detailText}>Duration: {job.duration}</Text>
+        </View>
+        <View style={styles.detailItem}>
+          <Icon name="cash-outline" size={20} color={colors.text} />
+          <Text style={styles.detailText}>Budget: {job.budget}</Text>
+        </View>
+      </View>
+
+      <TouchableOpacity style={styles.bidButton} onPress={() => setShowBidModal(true)}>
+        <Text style={styles.bidButtonText}>Submit a Proposal</Text>
       </TouchableOpacity>
 
       <Modal
-        visible={showApplicationModal}
+        visible={showBidModal}
         animationType="slide"
         transparent={true}
-        onRequestClose={() => setShowApplicationModal(false)}
+        onRequestClose={() => setShowBidModal(false)}
       >
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Submit Proposal</Text>
+            <Text style={styles.modalTitle}>Submit a Proposal</Text>
             <TextInput
               style={styles.input}
-              placeholder="Proposed Rate ($/hr)"
-              value={proposedRate}
-              onChangeText={setProposedRate}
+              placeholder="Bid Amount ($)"
+              value={bidAmount}
+              onChangeText={setBidAmount}
               keyboardType="numeric"
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Delivery Time (e.g., 5 days)"
+              value={deliveryTime}
+              onChangeText={setDeliveryTime}
             />
             <TextInput
               style={[styles.input, styles.coverLetterInput]}
@@ -62,7 +107,7 @@ const JobDetailsScreen = ({ route, navigation }) => {
               onChangeText={setCoverLetter}
               multiline
             />
-            <TouchableOpacity style={styles.submitButton} onPress={handleSubmitApplication}>
+            <TouchableOpacity style={styles.submitButton} onPress={handleSubmitBid}>
               <Text style={styles.submitButtonText}>Submit Proposal</Text>
             </TouchableOpacity>
           </View>
@@ -73,110 +118,24 @@ const JobDetailsScreen = ({ route, navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
+  // ... (keep existing styles)
+  clientDetails: {
     flex: 1,
-    padding: 20,
-    backgroundColor: colors.background,
+    marginLeft: 10,
   },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: colors.text,
-    marginBottom: 10,
+  postedDate: {
+    fontSize: 12,
+    color: colors.textLight,
   },
-  budget: {
-    fontSize: 18,
-    color: colors.primary,
-    fontWeight: 'bold',
+  detailItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
     marginBottom: 5,
   },
-  category: {
-    fontSize: 16,
-    color: colors.secondary,
-    marginBottom: 20,
-  },
-  section: {
-    marginBottom: 20,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: colors.text,
-    marginBottom: 10,
-  },
-  description: {
-    fontSize: 16,
-    color: colors.text,
-    lineHeight: 24,
-  },
-  skillsContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-  },
-  skillItem: {
-    backgroundColor: colors.primary,
-    borderRadius: 20,
-    paddingVertical: 5,
-    paddingHorizontal: 10,
-    marginRight: 10,
-    marginBottom: 10,
-  },
-  skillText: {
-    color: colors.background,
+  detailText: {
     fontSize: 14,
-  },
-  applyButton: {
-    backgroundColor: colors.primary,
-    padding: 15,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginTop: 20,
-  },
-  applyButtonText: {
-    color: colors.background,
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  modalContent: {
-    backgroundColor: colors.background,
-    borderRadius: 8,
-    padding: 20,
-    width: '90%',
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
     color: colors.text,
-    marginBottom: 20,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 8,
-    padding: 10,
-    marginBottom: 15,
-    color: colors.text,
-  },
-  coverLetterInput: {
-    height: 150,
-    textAlignVertical: 'top',
-  },
-  submitButton: {
-    backgroundColor: colors.primary,
-    padding: 15,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  submitButtonText: {
-    color: colors.background,
-    fontSize: 16,
-    fontWeight: 'bold',
+    marginLeft: 10,
   },
 });
 
