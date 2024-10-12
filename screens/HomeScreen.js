@@ -4,8 +4,6 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { colors } from '../styles/colors';
 import SearchBar from '../components/SearchBar';
 
-console.log('Colors in HomeScreen:', colors);
-
 const dummyJobs = [
   { id: '1', title: 'React Native Developer', budget: '$30-50/hr', description: 'We need a skilled React Native developer for a 3-month project.' },
   { id: '2', title: 'UI/UX Designer', budget: '$1000-2000', description: 'Looking for a creative UI/UX designer to redesign our mobile app.' },
@@ -28,6 +26,13 @@ const HomeScreen = ({ navigation }) => {
     <View style={styles.container}>
       <SearchBar placeholder="Search jobs..." onChangeText={() => {}} />
       <Text style={styles.header}>Welcome to GoodPeople</Text>
+      <TouchableOpacity
+        style={styles.postJobButton}
+        onPress={() => navigation.navigate('PostJob')}
+      >
+        <Icon name="add-circle-outline" size={24} color={colors.background} />
+        <Text style={styles.postJobButtonText}>Post a New Job</Text>
+      </TouchableOpacity>
       <Text style={styles.subHeader}>Recent Job Postings</Text>
       <FlatList
         data={dummyJobs}
@@ -79,6 +84,20 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: colors.primary,
     fontWeight: 'bold',
+  },
+  postJobButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.primary,
+    padding: 10,
+    borderRadius: 8,
+    marginBottom: 15,
+  },
+  postJobButtonText: {
+    color: colors.background,
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginLeft: 10,
   },
 });
 

@@ -1,12 +1,13 @@
-import { colors } from './styles/colors';
-console.log('Colors in App.js:', colors);
-
-import React from 'react';
-import { registerRootComponent } from 'expo';
+import React, { useEffect } from 'react';
+import { View, Text } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
-import Icon from 'react-native-vector-icons/Ionicons';
+import { Ionicons } from '@expo/vector-icons';
+import axios from 'axios';
+import { colors } from './styles/colors';
+import useCustomFonts from './useFonts';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import HomeScreen from './screens/HomeScreen';
 import JobsScreen from './screens/JobsScreen';
@@ -18,8 +19,11 @@ import ChatScreen from './screens/ChatScreen';
 import LoginScreen from './screens/LoginScreen';
 import AuthLoadingScreen from './screens/AuthLoadingScreen';
 import RegistrationScreen from './screens/RegistrationScreen';
+import PostJobScreen from './screens/PostJobScreen';
 
 import { createUser } from './api';  // Assuming api.js is in the temp directory
+
+import 'react-native-gesture-handler';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -43,7 +47,7 @@ function MainTabs() {
             iconName = focused ? 'person' : 'person-outline';
           }
 
-          return <Icon name={iconName} size={size} color={color} />;
+          return <Ionicons name={iconName} size={size} color={color} />;
         },
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.textLight,
@@ -63,39 +67,89 @@ function MainTabs() {
 }
 
 export default function App() {
+  const fontsLoaded = useCustomFonts();
+
+  useEffect(() => {
+    // Add global axios error interceptor
+    const interceptor = axios.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        console.error('Axios error:', error);
+        if (error.response) {
+          console.error('Response data:', error.response.data);
+          console.error('Response status:', error.response.status);
+          console.error('Response headers:', error.response.headers);
+        } else if (error.request) {
+          console.error('No response received:', error.request);
+        } else {
+          console.error('Error setting up request:', error.message);
+        }
+        return Promise.reject(error);
+      }
+    );
+
+    // Cleanup function
+    return () => {
+      axios.interceptors.response.eject(interceptor);
+    };
+  }, []);
+
+  if (!fontsLoaded) {
+    return <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <Text>Loading fonts...</Text>
+    </View>;
+  }
+
   return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName="AuthLoading">
-        <Stack.Screen 
-          name="AuthLoading" 
-          component={AuthLoadingScreen} 
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen 
-          name="Login" 
-          component={LoginScreen} 
-        />
-        <Stack.Screen 
-          name="Registration" 
-          component={RegistrationScreen} 
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen 
-          name="Main" 
-          component={MainTabs} 
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen 
-          name="JobDetails" 
-          component={JobDetailsScreen} 
-          options={{ title: 'Job Details' }}
-        />
-        <Stack.Screen 
-          name="ChatScreen" 
-          component={ChatScreen} 
-          options={({ route }) => ({ title: route.params.sender })}
-        />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <SafeAreaProvider>
+      <NavigationContainer>
+        <Stack.Navigator 
+          initialRouteName="AuthLoading"
+          screenOptions={{
+            headerStyle: {
+              backgroundColor: colors.primary,
+            },
+            headerTintColor: colors.background,
+            headerTitleStyle: {
+              fontWeight: 'bold',
+            },
+          }}
+        >
+          <Stack.Screen 
+            name="AuthLoading" 
+            component={AuthLoadingScreen} 
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen 
+            name="Login" 
+            component={LoginScreen} 
+          />
+          <Stack.Screen 
+            name="Registration" 
+            component={RegistrationScreen} 
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen 
+            name="Main" 
+            component={MainTabs} 
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen 
+            name="JobDetails" 
+            component={JobDetailsScreen} 
+            options={{ title: 'Job Details' }}
+          />
+          <Stack.Screen 
+            name="ChatScreen" 
+            component={ChatScreen} 
+            options={({ route }) => ({ title: route.params.sender })}
+          />
+          <Stack.Screen 
+            name="PostJob" 
+            component={PostJobScreen} 
+          />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </SafeAreaProvider>
   );
 }

@@ -18,6 +18,8 @@ app.use(express.json());
 
 app.use((req, res, next) => {
   console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+  console.log('Request headers:', req.headers);
+  console.log('Request body:', req.body);
   next();
 });
 
@@ -89,16 +91,21 @@ app.post('/api/create-test-user', async (req, res) => {
 });
 
 app.post('/api/login', async (req, res) => {
+  console.log('Login attempt received:', req.body);
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
+    console.log('User found:', user ? 'Yes' : 'No');
     if (user && await bcrypt.compare(password, user.password)) {
       const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+      console.log('Login successful');
       res.json({ success: true, token });
     } else {
+      console.log('Login failed');
       res.json({ success: false });
     }
   } catch (error) {
+    console.error('Error during login:', error);
     res.status(500).json({ message: 'Error during login', error: error.message });
   }
 });
@@ -122,4 +129,10 @@ app.post('/api/register', async (req, res) => {
 
 app.listen(port, '0.0.0.0', () => {
   console.log(`Server running on port ${port}`);
+});
+
+// Add this at the very end of your file, after all other routes
+app.use((req, res) => {
+  console.log(`Unmatched route: ${req.method} ${req.url}`);
+  res.status(404).send('Not Found');
 });
